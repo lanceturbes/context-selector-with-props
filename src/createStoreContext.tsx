@@ -32,9 +32,15 @@ export function createStoreContext<
     if (!store) {
       throw new Error("useStoreSelector must be used within a StoreProvider");
     }
-    return React.useSyncExternalStore(store.subscribe, () => {
-      return selector(store.getState());
-    });
+    const [snapshot, setSnapshot] = React.useState(() =>
+      selector(store.getState())
+    );
+    React.useEffect(() => {
+      return store.subscribe(() => {
+        setSnapshot(selector(store.getState()));
+      });
+    }, [store, selector]);
+    return snapshot;
   }
 
   function useStoreDispatch() {
