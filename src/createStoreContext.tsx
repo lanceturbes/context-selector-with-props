@@ -1,9 +1,18 @@
 import React from "react";
-import { Reducer, Store } from "./Store";
+import { Action, Reducer, Store } from "./Store";
 
+/**
+ * Creates a React component-level store with the specified state and action types.
+ * Allows for fine-grained updates to the UI and clean state management.
+ * Cases allow for side effects to be dispatched from the reducer.
+ *
+ * @template TState - The type of the state object.
+ * @template TAction - The type of the action object.
+ * @returns An object containing the StoreProvider, useStoreSelector, and useStoreDispatch functions.
+ */
 export function createStoreContext<
   TState extends object,
-  TAction extends { type: string; payload?: unknown }
+  TAction extends Action
 >() {
   const Context = React.createContext<Store<TState, TAction> | null>(null);
 
@@ -41,7 +50,7 @@ export function createStoreContext<
 
 export type StoreProviderProps<
   TState extends object,
-  TAction extends { type: string; payload?: unknown }
+  TAction extends Action
 > = {
   children: React.ReactNode;
   initialState: TState;

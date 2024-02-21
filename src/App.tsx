@@ -3,7 +3,9 @@ import { createStoreContext } from "./createStoreContext";
 
 export default function App() {
   return (
+    // Could theoretically pass props to initialState and reducer
     <GlobalStoreProvider initialState={state} reducer={reducer}>
+      {/* Any component here can subscribe to the global store */}
       <Counter />
     </GlobalStoreProvider>
   );

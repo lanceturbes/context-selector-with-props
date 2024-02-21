@@ -1,11 +1,11 @@
 export class EventBus {
-  listeners: Set<() => void>;
+  listeners: Set<Listener>;
 
   constructor() {
     this.listeners = new Set();
   }
 
-  addListener(listener: () => void): () => void {
+  addListener(listener: Listener): Unsubscribe {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
@@ -18,3 +18,7 @@ export class EventBus {
     }
   }
 }
+
+export type Listener = () => void;
+
+export type Unsubscribe = () => void;
