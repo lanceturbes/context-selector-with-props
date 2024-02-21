@@ -25,7 +25,11 @@ export function Counter() {
   );
 }
 
+type GlobalState = { count: number };
+
 const state: GlobalState = { count: 0 };
+
+type GlobalAction = { type: "INCREMENT"; payload: number } | { type: "EFFECT" };
 
 const reducer: Reducer<GlobalState, GlobalAction> = (state, action) => {
   switch (action.type) {
@@ -47,7 +51,3 @@ const {
   useStoreDispatch: useGlobalStoreDispatch,
   useStoreSelector: useGlobalStoreSelector,
 } = createStoreContext<GlobalState, GlobalAction>();
-
-type GlobalState = { count: number };
-
-type GlobalAction = { type: "INCREMENT"; payload: number } | { type: "EFFECT" };
