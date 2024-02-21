@@ -6,24 +6,38 @@ export default function App() {
     // Could theoretically pass props to initialState and reducer
     <GlobalStoreProvider initialState={state} reducer={reducer}>
       {/* Any component here can subscribe to the global store */}
-      <Counter />
-      <DogImageResponse />
+      <div style={appStyles.container}>
+        <Counter />
+        <EffectButton />
+        <DogImageResponse />
+      </div>
     </GlobalStoreProvider>
   );
 }
+
+const appStyles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    height: "100vh",
+  },
+} as const;
 
 export function Counter() {
   const count = useGlobalStoreSelector((state) => state.count);
   const dispatch = useGlobalStoreDispatch();
 
   return (
-    <>
-      <button onClick={() => dispatch({ type: "INCREMENT", payload: 1 })}>
-        {count}
-      </button>
-      <button onClick={() => dispatch({ type: "EFFECT" })}>EFFECT</button>
-    </>
+    <button onClick={() => dispatch({ type: "INCREMENT", payload: 1 })}>
+      {count}
+    </button>
   );
+}
+
+function EffectButton() {
+  const dispatch = useGlobalStoreDispatch();
+  return <button onClick={() => dispatch({ type: "EFFECT" })}>EFFECT</button>;
 }
 
 function DogImageResponse() {
@@ -47,7 +61,7 @@ type GlobalState = {
   data: DogImageApiResponse | null;
 };
 
-const state: GlobalState = { count: 0, isLoading: true, data: null };
+const state: GlobalState = { count: 0, isLoading: false, data: null };
 
 type GlobalAction =
   | { type: "INCREMENT"; payload: number }
