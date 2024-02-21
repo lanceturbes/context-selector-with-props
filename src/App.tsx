@@ -7,9 +7,16 @@ export default function App() {
       reducer={(state, action) => {
         switch (action.type) {
           case "INCREMENT":
-            return { count: state.count + 1 };
-          case "DECREMENT":
-            return { count: state.count - 1 };
+            return [{ count: state.count + 1 }];
+          case "EFFECT":
+            return [
+              { count: state.count - 1 },
+              (dispatch) => {
+                setTimeout(() => {
+                  dispatch({ type: "INCREMENT" });
+                }, 1000);
+              },
+            ];
         }
       }}
     >
@@ -23,12 +30,15 @@ function Counter() {
   const dispatch = useStoreDispatch();
 
   return (
-    <button onClick={() => dispatch({ type: "INCREMENT" })}>{count}</button>
+    <>
+      <button onClick={() => dispatch({ type: "INCREMENT" })}>{count}</button>
+      <button onClick={() => dispatch({ type: "EFFECT" })}>EFFECT</button>
+    </>
   );
 }
 
 type State = { count: number };
-type Action = { type: "INCREMENT" } | { type: "DECREMENT" };
+type Action = { type: "INCREMENT" } | { type: "EFFECT" };
 
 const { Provider, useStoreDispatch, useStoreSelector } = createStoreContext<
   State,
@@ -64,7 +74,13 @@ class Store<
 
   constructor(
     private state: TState,
-    private reducer: (state: TState, action: TAction) => TState
+    private reducer: (
+      state: TState,
+      action: TAction
+    ) => [
+      TState,
+      ((dispatch: (action: TAction) => void, getState: () => TState) => void)?
+    ]
   ) {}
 
   getState() {
@@ -72,7 +88,11 @@ class Store<
   }
 
   dispatch(action: TAction) {
-    this.state = this.reducer(this.state, action);
+    const [nextState, effect] = this.reducer(this.state, action);
+    this.state = nextState;
+    if (effect) {
+      effect(this.dispatch.bind(this), this.getState.bind(this));
+    }
     this.eventBus.emit();
   }
 
@@ -94,7 +114,13 @@ function createStoreContext<
   }: {
     children: React.ReactNode;
     initialState: TState;
-    reducer: (state: TState, action: TAction) => TState;
+    reducer: (
+      state: TState,
+      action: TAction
+    ) => [
+      TState,
+      ((dispatch: (action: TAction) => void, getState: () => TState) => void)?
+    ];
   }) {
     const store = React.useRef<Store<TState, TAction>>();
     if (!store.current) {
